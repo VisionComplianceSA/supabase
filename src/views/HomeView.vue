@@ -25,8 +25,16 @@ async function verifyOTP() {
   console.log(data, error)
 }
 
+async function callFunction() {
+  const { data, error } = await supabase.functions.invoke('hello-world', {
+    body: { name: 'Functions' }
+  })
+  console.log(data, error)
+}
+
 onMounted(() => {
   getUsers()
+  callFunction()
   supabase.auth.getUser().then((user) => {
     console.log('getUser', user)
   })
