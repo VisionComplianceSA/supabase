@@ -4,8 +4,9 @@ import { supabase } from '@/lib/supabase'
 
 const users = ref([])
 async function getUsers() {
-  const { data } = await supabase.from('users').select()
+  const { data, error } = await supabase.from('users').select()
   users.value = data
+  console.log(data, error)
 }
 
 const email = 'dev@visioncompliance.ch'
