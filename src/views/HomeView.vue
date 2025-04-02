@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { supabase } from '@/lib/supabase'
 
+const user = ref()
 const users = ref([])
 async function getUsers() {
   const { data, error } = await supabase.from('users').select()
@@ -17,12 +18,18 @@ async function signin() {
   })
   console.log(data, error)
 }
+async function signout() {
+  const { data, error } = await supabase.auth.signOut()
+  user.value = null
+  console.log(data, error)
+}
 async function verifyOTP() {
   const { data, error } = await supabase.auth.verifyOtp({
     email,
     token: otp.value,
     type: 'email',
   })
+  user.value = data.user
   console.log(data, error)
 }
 
@@ -36,8 +43,9 @@ async function callFunction() {
 onMounted(() => {
   getUsers()
   callFunction()
-  supabase.auth.getUser().then((user) => {
-    console.log('getUser', user)
+  supabase.auth.getUser().then(({ data, error }) => {
+    user.value = data.user
+    console.log('getUser', data, error)
   })
 })
 </script>
@@ -45,7 +53,8 @@ onMounted(() => {
 <template>
   <ul>
     <li v-for="user in users" :key="user.id">{{ user.name }}</li>
-    <button @click="signin">signin</button>
+    <button v-if="user" @click="signout">signout</button>
+    <button v-else @click="signin">signin</button>
     otp
     <input type="text" v-model="otp" />
     <button @click="verifyOTP">verify</button>
