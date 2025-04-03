@@ -331,5 +331,5 @@ entrypoint = "./functions/signin/index.ts"
 
 [auth.hook.send_email]
 enabled = true
-uri = "http://host.docker.internal:54321/functions/v1/signin"
+uri = "http://host.docker.internal:3000/signin"
 secrets = "env(SEND_EMAIL_HOOK_SECRET)"
