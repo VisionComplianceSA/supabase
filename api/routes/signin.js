@@ -21,9 +21,9 @@ const templates = {
   }
 }
 
-function generateConfirmationURL (emailData) {
+function generateConfirmationURL (email_data) {
   // TODO: replace the ref with your project ref
-  return `http://127.0.0.1:54321/auth/v1/verify?token=${emailData.token}&type=${emailData.email_action_type}&redirect_to=${emailData.redirect_to}`
+  return `http://127.0.0.1:54321/auth/v1/verify?token=${email_data.token}&type=${email_data.email_action_type}&redirect_to=${email_data.redirect_to}`
 }
 
 router.post('/', async function (req, res, next) {
@@ -32,20 +32,20 @@ router.post('/', async function (req, res, next) {
   const headers = req.headers
   const base64Secret = process.env.SEND_EMAIL_HOOK_SECRET.replace('v1,whsec_', '')
   const wh = new Webhook.Webhook(base64Secret)
-  const { user, emailData } = wh.verify(payload, headers)
+  const { user, email_data } = wh.verify(payload, headers)
 
   const language = (user.user_metadata && user.user_metadata.i18n) || 'en'
-  const subject = subjects[language][emailData.email_action_type] || 'Notification'
+  const subject = subjects[language][email_data.email_action_type] || 'Notification'
 
-  const template = templates[language][emailData.email_action_type]
-  const confirmationUrl = generateConfirmationURL(emailData)
+  const template = templates[language][email_data.email_action_type]
+  const confirmationUrl = generateConfirmationURL(email_data)
   const htmlBody = template
     .replace('{{confirmation_url}}', confirmationUrl)
-    .replace('{{token}}', emailData.token || '')
-    .replace('{{new_token}}', emailData.new_token || '')
-    .replace('{{site_url}}', emailData.site_url || '')
-    .replace('{{old_email}}', emailData.email || '')
-    .replace('{{new_email}}', emailData.new_email || '')
+    .replace('{{token}}', email_data.token || '')
+    .replace('{{new_token}}', email_data.new_token || '')
+    .replace('{{site_url}}', email_data.site_url || '')
+    .replace('{{old_email}}', email_data.email || '')
+    .replace('{{new_email}}', email_data.new_email || '')
 
   try {
     const transporter = nodemailer.createTransport({
@@ -65,7 +65,10 @@ router.post('/', async function (req, res, next) {
     }
     await transporter.sendMail(mailOptions)
     console.log('email sent')
-    res.send('Email sent successfully.')
+    res.status(200).json({
+      message: 'Email sent successfully.'
+    })
+    return
   } catch (error) {
     console.log(error)
     res.send(error.message)

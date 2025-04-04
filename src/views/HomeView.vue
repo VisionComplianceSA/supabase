@@ -40,6 +40,22 @@ async function callFunction() {
   console.log(data, error)
 }
 
+async function callAPI(access_token) {
+  const response = await fetch('http://localhost:3000/access', {
+    headers: {
+      'Authorization': `Bearer ${access_token}`,
+      'Content-Type': 'application/json'
+    }
+  })
+  console.log('API', await response.json())
+}
+
+supabase.auth.onAuthStateChange((event, session) => {
+  console.log('onAuthStateChange', event, session)
+  user.value = session?.user
+  callAPI(session?.access_token)
+})
+
 onMounted(() => {
   getUsers()
   callFunction()

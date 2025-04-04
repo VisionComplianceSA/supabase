@@ -4,12 +4,14 @@ const path = require('path')
 const cookieParser = require('cookie-parser')
 const logger = require('morgan')
 require('dotenv').config({ path: './.env.local' })
+const cors = require('cors')
 
 const indexRouter = require('./routes/index')
 const signin = require('./routes/signin')
+const access = require('./routes/access')
 
 const app = express()
-
+app.use(cors())
 app.use(logger('dev'))
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
@@ -18,6 +20,7 @@ app.use(express.static(path.join(__dirname, 'public')))
 
 app.use('/', indexRouter)
 app.use('/signin', signin)
+app.use('/access', access)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
