@@ -35,7 +35,7 @@ async function verifyOTP() {
 
 async function callFunction() {
   const { data, error } = await supabase.functions.invoke('hello-world', {
-    body: { name: 'Functions' }
+    body: { name: 'Functions' },
   })
   console.log(data, error)
 }
@@ -43,11 +43,24 @@ async function callFunction() {
 async function callAPI(access_token) {
   const response = await fetch('http://localhost:3000/access', {
     headers: {
-      'Authorization': `Bearer ${access_token}`,
-      'Content-Type': 'application/json'
-    }
+      Authorization: `Bearer ${access_token}`,
+      'Content-Type': 'application/json',
+    },
   })
   console.log('API', await response.json())
+}
+
+async function upload(event) {
+  const file = event.target.files[0]
+  const { data, error } = await supabase.storage.from('testid').upload('public/test.png', file)
+  console.log(data, error)
+}
+
+const img = ref()
+async function download() {
+  const { data, error } = await supabase.storage.from('testid').download('public/test.png')
+  console.log(data, error)
+  img.value = URL.createObjectURL(data)
 }
 
 supabase.auth.onAuthStateChange((event, session) => {
@@ -74,5 +87,8 @@ onMounted(() => {
     otp
     <input type="text" v-model="otp" />
     <button @click="verifyOTP">verify</button>
+    <input type="file" @change="upload" />
+    <button @click="download">download</button>
+    <img :src="img" />
   </ul>
 </template>
