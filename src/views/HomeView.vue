@@ -9,6 +9,31 @@ async function getUsers() {
   users.value = data
   console.log(data, error)
 }
+async function getUsersGraphQL() {
+  const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/graphql/v1`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
+      Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+    },
+    body: JSON.stringify({
+      query: `query {
+  usersCollection(first: 1, filter: {id: {eq: 1}}) {
+    edges {
+      node {
+        name
+      }
+    }
+  }
+}
+  `,
+      variables: {},
+    }),
+  })
+  const result = await response.json()
+  console.log('graphQL', result)
+}
 
 const email = 'dev@visioncompliance.ch'
 const otp = ref()
@@ -71,7 +96,8 @@ supabase.auth.onAuthStateChange((event, session) => {
 
 onMounted(() => {
   getUsers()
-  callFunction()
+  getUsersGraphQL()
+  // callFunction()
   supabase.auth.getUser().then(({ data, error }) => {
     user.value = data.user
     console.log('getUser', data, error)
