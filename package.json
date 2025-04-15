@@ -12,7 +12,15 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.49.4",
+    "@uppy/core": "^4.4.4",
+    "@uppy/dashboard": "^4.3.3",
+    "@uppy/drag-drop": "^4.1.2",
+    "@uppy/file-input": "^4.1.2",
+    "@uppy/progress-bar": "^4.2.1",
+    "@uppy/tus": "^4.2.2",
+    "@uppy/vue": "^2.1.1",
     "pinia": "^3.0.1",
+    "tus-js-client": "^4.3.1",
     "vue": "^3.5.13",
     "vue-router": "^4.5.0"
   },
