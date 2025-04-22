@@ -1,35 +1,19 @@
-# supabase
+supabase config
 
-This template should help get you started developing with Vue 3 in Vite.
+docker-compose.yml
 
-## Recommended IDE Setup
+kong environment:
+KONG_PORT_MAPS: 443:8000
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
-
-```sh
-npm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
-npm run dev
-```
-
-### Compile and Minify for Production
-
-```sh
-npm run build
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
-```
+storage environment:
+STORAGE_BACKEND: s3
+TENANT_ID: stub
+REGION: us-east-1
+GLOBAL_S3_BUCKET: supabase
+STORAGE_S3_ENDPOINT: https://s3.pub2.infomaniak.cloud
+STORAGE_S3_FORCE_PATH_STYLE: "true"
+AWS_ACCESS_KEY_ID:
+AWS_SECRET_ACCESS_KEY:
+TUS_ALLOW_S3_TAGS: "false"
+REQUEST_ALLOW_X_FORWARDED_PATH: "true"
+NODE_ENV: production

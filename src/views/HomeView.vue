@@ -83,9 +83,11 @@ async function callAPI(access_token) {
 
 async function upload(event) {
   const file = event.target.files[0]
-  // uploadFile(file)
-  const { data, error } = await supabase.storage.from('supabase').upload('public/test.png', file)
-  console.log(data, error)
+  uploadFile(file)
+  /* const { data, error } = await supabase.storage
+    .from('supabase')
+    .upload(`public/test/${Date.now()}/test.png`, file)
+  console.log(data, error) */
 }
 
 const uppy = new Uppy()
@@ -96,7 +98,7 @@ const initializeUppy = async () => {
   uppy
     .use(Tus, {
       endpoint: `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/upload/resumable`, // Supabase TUS endpoint
-      retryDelays: [0, 3000], // Retry delays for resumable uploads
+      retryDelays: [0], // Retry delays for resumable uploads
       headers: {
         authorization: `Bearer ${session?.access_token}`,
         apikey: import.meta.env.VITE_SUPABASE_ANON_KEY, // API key for Supabase
@@ -112,6 +114,7 @@ const initializeUppy = async () => {
       // Attach metadata to each file, including bucket name and content type
       console.log(file.meta)
       file.meta = {
+        ...file.meta,
         bucketName: 'supabase', // Bucket specified by the user of the hook
         objectName: file.name, // Use file name as object name
         contentType: file.type
@@ -125,22 +128,19 @@ async function uploadFile(file) {
     file.metadata = null
     var upload = new tus.Upload(file, {
       endpoint: `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/upload/resumable`,
-      retryDelays: [0, 3000],
+      retryDelays: [0],
       headers: {
         authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+        //authorization: `Bearer ${session.access_token}`,
         'x-upsert': 'true' // optionally set upsert to true to overwrite existing files
       },
       uploadDataDuringCreation: true,
       removeFingerprintOnSuccess: true, // Important if you want to allow re-uploading the same file https://github.com/tus/tus-js-client/blob/main/docs/api.md#removefingerprintonsuccess
       metadata: {
         bucketName: 'supabase',
-        objectName: 'public/test.jpg',
+        objectName: `public/test/${Date.now()}/test.png`,
         contentType: 'image/jpeg',
-        cacheControl: '3600',
-        metadata: JSON.stringify({
-          test1: 'test1',
-          test2: 'test2'
-        })
+        cacheControl: '3600'
       },
       chunkSize: 6 * 1024 * 1024, // NOTE: it must be set to 6MB (for now) do not change it
       onError: function (error) {
@@ -160,9 +160,11 @@ async function uploadFile(file) {
     return upload.findPreviousUploads().then(function (previousUploads) {
       // Found previous uploads so we select the first one.
       if (previousUploads.length) {
+        console.log('Found previous uploads with length', previousUploads)
         upload.resumeFromPreviousUpload(previousUploads[0])
       }
       // Start the upload
+      console.log('url', upload.url)
       upload.start()
     })
   })
