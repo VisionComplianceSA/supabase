@@ -17,3 +17,21 @@ AWS_SECRET_ACCESS_KEY:
 TUS_ALLOW_S3_TAGS: "false"
 REQUEST_ALLOW_X_FORWARDED_PATH: "true"
 NODE_ENV: production
+
+db backup
+`pg_dump -h localhost -p 5432 -U postgres.your-tenant-id -d postgres | gzip > /home/debian/backup/backup.sql.gz`
+
+cron
+`0 2 * * * pg_dump -h localhost -p 5432 -U postgres -d your_database_name | gzip > /path/to/backup/backup*$(date +\%Y-\%m-\%d).sql.gz`
+Create the .pgpass File:
+
+```
+touch ~/.pgpass
+chmod 600 ~/.pgpass
+```
+
+Add the Credentials: Add the following line to the .pgpass file:
+`localhost:5432:your_database_name:postgres:your_password`
+
+db restore
+`gunzip -c backup.sql.gz | psql -h localhost -p 5432 -U postgres.your-tenant-id -d postgres`
